@@ -10,7 +10,7 @@ GUILD_ID = int(os.getenv("GUILD_ID"))
 class Client(commands.Bot):
     async def setup_hook(self):
         # Load all cogs
-        
+        await self.load_extension("cogs.moderation")
         # Sync slash commands to the guild
         guild = discord.Object(id=GUILD_ID)
         self.tree.copy_global_to(guild=guild)
@@ -44,4 +44,5 @@ client = Client(command_prefix="!", intents=intents)
 if not TOKEN:
     raise RuntimeError("DISCORD_TOKEN is missing from .env")
 
-client.run(TOKEN)
+if __name__ == "__main__":
+    client.run(TOKEN)
