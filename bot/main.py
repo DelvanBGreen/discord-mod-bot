@@ -11,6 +11,7 @@ class Client(commands.Bot):
     async def setup_hook(self):
         # Load all cogs
         await self.load_extension("cogs.moderation")
+        await self.load_extension("cogs.automod")
         # Sync slash commands to the guild
         guild = discord.Object(id=GUILD_ID)
         self.tree.copy_global_to(guild=guild)
