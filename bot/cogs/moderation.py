@@ -91,7 +91,7 @@ class Moderation(commands.Cog):
         interaction: discord.Interaction,
         amount: int
     ):
-        if not is_admin(interaction.user):
+        if not is_moderator(interaction.user):
             await interaction.response.send_message(
                 "You don't have permission to use this command.",
                 ephemeral=True
@@ -113,6 +113,32 @@ class Moderation(commands.Cog):
             f"Successfully deleted {len(deleted)} messages.",
             ephemeral=True
         )
+
+    #-----warn---------------------------------
+    @app_commands.command(name="warn", description="Warn a member")
+    @app_commands.guilds(GUILD)
+    async def warn(self, interaction:discord.Interaction, member:discord.Member, reason:str):
+        if not is_moderator(interaction.user):
+            await interaction.response.send_message("You dont have permission to use this command", ephemeral=True)
+            return
+        if member==interaction.user:
+             await interaction.response.send_message("You cant warn yourself", ephemeral=True)
+             return
+
+        try:
+             await member.send(
+                  f'You have been warn in **{interaction.guild.name}**.\n'
+                  f'**Reason:** {reason}'
+             )
+             dm_sent = True
+        except (discord.Forbidden, discord.HTTPException):
+             dm_sent =False
+
+        await interaction.response.send_message(
+             f"{member.name} has been warned for {reason}.\n"
+             f"DM sent: {'Yes' if dm_sent else 'No'}", ephemeral=True
+        )
+              
 
 async def setup(bot: commands.Bot):
     await bot.add_cog(Moderation(bot))
