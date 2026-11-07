@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 GUILD_ID = int(os.getenv("GUILD_ID"))
-
+#test
 class Client(commands.Bot):
     async def setup_hook(self):
         # Load all cogs
