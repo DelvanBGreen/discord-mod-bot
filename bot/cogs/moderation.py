@@ -41,7 +41,8 @@ class Moderation(commands.Cog):
             await interaction.response.send_message("You dont have persmission to use this command", ephemeral=True)
             return
         duration = timedelta(minutes=minutes)
-        await member.timeout(duration = duration, reason=reason)
+        await member.timeout(duration, reason=reason)
+        await interaction.response.send_message(f'{member} has been timed out for {minutes} minutes')
 
 
 async def setup(bot: commands.Bot):
