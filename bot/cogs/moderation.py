@@ -25,7 +25,20 @@ class Moderation(commands.Cog):
             await interaction.response.send_message("You cant kick yourself", ephemeral=True)
             return
         await member.kick(reason=reason)
-        await interaction.response.send_message(f'{member} has been kicked')
+        
+        try:
+            await member.send(
+                f'You have been warn in **{interaction.guild.name}**.\n'
+                f'**Reason:** {reason}'
+            )
+            dm_sent = True
+        except (discord.Forbidden, discord.HTTPException):
+                dm_sent =False
+
+        await interaction.response.send_message(
+                f"{member.name} has been banned for {reason}.\n"
+                f"DM sent: {'Yes' if dm_sent else 'No'}", ephemeral=True
+        )
 
 
     #---------ban-----------------------------------
@@ -39,7 +52,20 @@ class Moderation(commands.Cog):
                     await interaction.response.send_message("You cant ban yourself", ephemeral=True)
                     return
         await interaction.guild.ban(user, reason=reason)
-        await interaction.response.send_message(f'{user} has been banned')
+
+        try:
+            await user.send(
+                f'You have been warn in **{interaction.guild.name}**.\n'
+                f'**Reason:** {reason}'
+            )
+            dm_sent = True
+        except (discord.Forbidden, discord.HTTPException):
+                dm_sent =False
+
+        await interaction.response.send_message(
+                f"{user.name} has been banned for {reason}.\n"
+                f"DM sent: {'Yes' if dm_sent else 'No'}", ephemeral=True
+        )
     
         
 
