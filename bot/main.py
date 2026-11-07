@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
-GUILD_ID = os.getenv("GUILD_ID")
+GUILD_ID = int(os.getenv("GUILD_ID"))
 
 class Client(commands.Bot):
     async def setup_hook(self):
@@ -25,7 +25,7 @@ class Client(commands.Bot):
             return
         
         if self.user in message.mentions:
-            await message.channel.send(f'Hi there, {message.author.mention}. I am Greens\' Gambling Bot, a bot made by <@{746447461886853131}>')
+            await message.channel.send(f'Hi there, {message.author.mention}. I am Greens\' Moderation Bot, a bot made by <@{746447461886853131}>')
 
 
         await self.process_commands(message)
@@ -36,14 +36,9 @@ class Client(commands.Bot):
 
 intents = discord.Intents.default()
 intents.message_content = True
+intents.members = True
 
-
-intents = discord.Intents.default()
-intents.message_content = True
-
-client = discord.Client(intents=intents)
-
-
+client = Client(command_prefix="!", intents=intents)
 
 # Start the bot
 if not TOKEN:
