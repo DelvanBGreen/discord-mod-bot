@@ -16,7 +16,7 @@ class Moderation(commands.Cog):
 
     #---------kick--------------------------------
     @app_commands.command(name="kick", description="Kick a member from the server")
-    @app_commands.guilds(GUILD)
+    @app_commands.guild_only
     async def kick(self, interaction: discord.Interaction, member: discord.Member, reason: str = "No reason provided"):
         if not is_moderator(interaction.user):
             await interaction.response.send_message("You dont have persmission to use this command", ephemeral=True)
@@ -43,7 +43,7 @@ class Moderation(commands.Cog):
 
     #---------ban-----------------------------------
     @app_commands.command(name="ban", description="Ban a user from the server")
-    @app_commands.guilds(GUILD)
+    @app_commands.guild_only
     async def ban(self, interaction: discord.Interaction, user: discord.User, reason: str = "No reason provided"):
         if not is_admin(interaction.user):
             await interaction.response.send_message("You dont have permission to use this command", ephemeral=True)
@@ -71,7 +71,7 @@ class Moderation(commands.Cog):
 
     #unban
     @app_commands.command(name="unban", description="Unban a user from the server")
-    @app_commands.guilds(GUILD)
+    @app_commands.guild_only
     async def unban(self, interaction: discord.Interaction, user: discord.User):
         if not is_admin(interaction.user):
             await interaction.response.send_message("You dont have permission to use this command", ephemeral=True)
@@ -93,7 +93,7 @@ class Moderation(commands.Cog):
 
     #-------timeout--------------------------------------
     @app_commands.command(name="timeout", description="Kick a member from the server")
-    @app_commands.guilds(GUILD)
+    @app_commands.guild_only
     async def timout(self, interaction: discord.Interaction, member: discord.Member,minutes: int, reason: str = "No reason provided"):
         if not is_moderator(interaction.user):
             await interaction.response.send_message("You dont have persmission to use this command", ephemeral=True)
@@ -111,7 +111,7 @@ class Moderation(commands.Cog):
 
     #------purge------------------------------------------
     @app_commands.command(name="purge", description="Delete multiple messages")
-    @app_commands.guilds(GUILD)
+    @app_commands.guild_only
     async def purge(
         self,
         interaction: discord.Interaction,
@@ -142,7 +142,7 @@ class Moderation(commands.Cog):
 
     #-----warn---------------------------------
     @app_commands.command(name="warn", description="Warn a member")
-    @app_commands.guilds(GUILD)
+    @app_commands.guild_only
     async def warn(self, interaction:discord.Interaction, member:discord.Member, reason:str):
         if not is_moderator(interaction.user):
             await interaction.response.send_message("You dont have permission to use this command", ephemeral=True)
