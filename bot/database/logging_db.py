@@ -7,9 +7,9 @@ from .db import LOG_DB
 
 async def log_moderation(
     guild_id: int,
-    user_id: int,
     moderator_id: int,
     action: str,
+    user_id: int | None = None,
     reason: str | None = None
 ):
     """Record a moderation action in the database."""

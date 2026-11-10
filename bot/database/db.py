@@ -21,7 +21,7 @@ async def init_db():
             CREATE TABLE IF NOT EXISTS moderation_logs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
                 guild_id INTEGER NOT NULL,
-                user_id INTEGER NOT NULL,
+                user_id INTEGER,
                 moderator_id INTEGER NOT NULL,
                 action TEXT NOT NULL,
                 reason TEXT,

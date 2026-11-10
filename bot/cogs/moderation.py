@@ -37,9 +37,15 @@ class Moderation(commands.Cog):
                 dm_sent =False
 
         await interaction.response.send_message(
-                f"{member.name} has been banned for {reason}.\n"
+                f"{member.name} has been kicked for {reason}.\n"
                 f"DM sent: {'Yes' if dm_sent else 'No'}", ephemeral=True
         )
+        await log_moderation(
+            guild_id= interaction.guild_id,
+            user_id=member.id,
+            moderator_id=interaction.user.id,
+            action="kick",
+            reason=reason)
 
 
     #---------ban-----------------------------------
@@ -56,7 +62,7 @@ class Moderation(commands.Cog):
 
         try:
             await user.send(
-                f'You have been warn in **{interaction.guild.name}**.\n'
+                f'You have been banned in **{interaction.guild.name}**.\n'
                 f'**Reason:** {reason}'
             )
             dm_sent = True
@@ -67,6 +73,12 @@ class Moderation(commands.Cog):
                 f"{user.name} has been banned for {reason}.\n"
                 f"DM sent: {'Yes' if dm_sent else 'No'}", ephemeral=True
         )
+        await log_moderation(
+            guild_id= interaction.guild_id,
+            user_id=user.id,
+            moderator_id=interaction.user.id,
+            action="timeout",
+            reason=reason)
     
         
 
@@ -151,6 +163,11 @@ class Moderation(commands.Cog):
             f"Successfully deleted {len(deleted)} messages.",
             ephemeral=True
         )
+        await log_moderation(
+             guild_id= interaction.guild_id,
+             moderator_id=interaction.user.id,
+             action="timeout",
+             reason=f"deleted {amount} messages")
 
     #-----warn---------------------------------
     @app_commands.command(name="warn", description="Warn a member")
@@ -176,6 +193,12 @@ class Moderation(commands.Cog):
              f"{member.name} has been warned for {reason}.\n"
              f"DM sent: {'Yes' if dm_sent else 'No'}", ephemeral=True
         )
+        await log_moderation(
+            guild_id= interaction.guild_id,
+            user_id=member.id,
+            moderator_id=interaction.user.id,
+            action="warn",
+            reason=reason)
               
 
 async def setup(bot: commands.Bot):
