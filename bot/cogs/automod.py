@@ -4,14 +4,13 @@ from discord import app_commands
 from utils.permissions import *
 from datetime import datetime, timedelta, timezone
 from utils.word_filter import contains_blocked_word
+from utils.spam_filter import SpamFilter
 import re
 
 
 def contains_link(text):
     pattern = r"(?:https?://|www\.)[^\s]+|\b[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+\b"
     return bool(re.search(pattern, text, re.IGNORECASE))
-
-
 
 
 class AutoMod(commands.Cog):
@@ -23,11 +22,32 @@ class AutoMod(commands.Cog):
 
         self.link_filter_enabled = True
         self.link_filter_resume_at = None
+
+        self.spam_filter_enabled = True
+
+        self.spam_filter = SpamFilter()
         
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
         if message.author.bot or message.guild is None:
             return
+
+
+        if self.spam_filter_enabled:
+            spam_type = self.spam_filter.check_spam(
+                message.guild.id,
+                message.author.id,
+                message.content
+            )
+
+            if spam_type:
+                await message.delete()
+
+                print(
+                    f"Spam detected from {message.author}: {spam_type}"
+                )
+
+                return
 
         # Check if the word filter should resume
         if self.word_filter_resume_at is not None:
@@ -58,8 +78,6 @@ class AutoMod(commands.Cog):
 
             except discord.HTTPException as e:
                 print(f"AutoMod error: {e}")
-
-
 
         
     @app_commands.command(name='disable_word_filter', description='disable word filtering for a set time or until its enableed again')
