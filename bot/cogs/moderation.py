@@ -4,6 +4,7 @@ from discord.ext import commands
 from utils.permissions import is_moderator, is_admin
 from datetime import timedelta
 from dotenv import load_dotenv
+from database.logging_db import log_moderation
 import os
 
 from main import GUILD_ID
@@ -100,12 +101,23 @@ class Moderation(commands.Cog):
             return
         if interaction.user == member:
              await interaction.response.send_message('You cant time yourself out', ephemeral=True)
+             return
 
         if member.is_timed_out():
              await interaction.response.send_message(f'{member} is already timed out', ephemeral=True)
+             return
 
         duration = timedelta(minutes=minutes)
         await member.timeout(duration, reason=reason)
+
+        await log_moderation(
+             guild_id= interaction.guild_id,
+             user_id=member.id,
+             moderator_id=interaction.user.id,
+             action="timeout",
+             reason=reason)
+
+
         await interaction.response.send_message(f'{member} has been timed out for {minutes} minutes')
 
 

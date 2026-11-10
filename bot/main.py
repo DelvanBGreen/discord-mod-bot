@@ -2,6 +2,7 @@ import discord
 from discord.ext import commands
 import os
 from dotenv import load_dotenv
+from database.db import init_db
 
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
@@ -10,6 +11,7 @@ GUILD_ID = int(os.getenv("GUILD_ID"))
 class Client(commands.Bot):
     async def setup_hook(self):
         # Load all cogs
+        await init_db()
         await self.load_extension("cogs.moderation")
         await self.load_extension("cogs.automod")
         # Sync slash commands to the guild
