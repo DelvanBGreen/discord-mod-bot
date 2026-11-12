@@ -31,7 +31,6 @@ class AutoMod(commands.Cog):
         
     @commands.Cog.listener()
     async def on_message(self, message: discord.Message):
-        self.message_deleted = False
         if message.author.bot or message.guild is None:
             return
 
@@ -70,14 +69,20 @@ class AutoMod(commands.Cog):
             try:
                 # Delete the offending message
                 await message.delete()
-                self.message_deleted = True
-
+                await log_moderation(
+                                guild_id=message.guild.id,
+                                moderator_id=self.bot.user.id,
+                                user_id=message.author.id,
+                                action="deleted message",
+                                reason="message contained a blocked word and/or link"
+                )
                 # Notify the user
                 await message.channel.send(
                     f"{message.author.mention}, your message was removed "
                     "for containing prohibited language.",
                     delete_after=5
                 )
+                return
 
             except discord.Forbidden:
                 print("AutoMod: Missing permissions.")
@@ -86,9 +91,16 @@ class AutoMod(commands.Cog):
                 print(f"AutoMod error: {e}")
 
         #check message for links
-        if (contains_link(message.content) and self.link_filter_enabled and self.message_deleted == False):
+        if (contains_link(message.content) and self.link_filter_enabled):
             try:
                 await message.delete()
+                await log_moderation(
+                                    guild_id=message.guild.id,
+                                    moderator_id=self.bot.user.id,
+                                    user_id=message.author.id,
+                                    action="deleted message",
+                                    reason="message contained a blocked word and/or link"
+                                )
 
                 await message.channel.send(
                     f"{message.author.mention}, your message was removed for containing a link",
@@ -98,7 +110,7 @@ class AutoMod(commands.Cog):
                 print("Automod: Missing permissions.")
             except discord.HTTPException as e:
                 print(f"Automod error: {e}")
-        self.message_deleted = False
+        
 
     
     @app_commands.command(name='disable_word_filter', description='disable word filtering for a set time or until its enableed again')
@@ -114,7 +126,7 @@ class AutoMod(commands.Cog):
             self.word_filter_enabled = False
             await interaction.response.send_message("Word filtering has been disabled, use /enablewordfilter, to turn it back on")
 
-            log_moderation(
+            await log_moderation(
                 guild_id=interaction.guild.id,
                 moderator_id=interaction.user.id,
                 action="Disabled the word filter"
@@ -129,7 +141,7 @@ class AutoMod(commands.Cog):
             await interaction.response.send_message(
                 f"Word filtering has been disabled for {time} minute(s)."
             )
-            log_moderation(
+            await log_moderation(
                 guild_id=interaction.guild.id,
                 moderator_id=interaction.user.id,
                 action=f"Temporarily disabled word filter for {time} minutes"
@@ -154,6 +166,11 @@ class AutoMod(commands.Cog):
         await interaction.response.send_message(
             "Word filtering has been enabled."
         )
+        await log_moderation(
+                        guild_id=interaction.guild.id,
+                        moderator_id=interaction.user.id,
+                        action="Enabled the word filter"
+                    )
 
     @app_commands.command(name='disable_link_filter', description='disable link filtering for a set time or until its enableed again')
     @app_commands.guild_only
@@ -167,6 +184,11 @@ class AutoMod(commands.Cog):
         if time == 0:
             self.link_filter_enabled = False
             await interaction.response.send_message("Link filtering has been disabled, use /enablelinkfilter, to turn it back on")
+            await log_moderation(
+                            guild_id=interaction.guild.id,
+                            moderator_id=interaction.user.id,
+                            action="Disabled the link filter"
+                        )
         else:
             self.link_filter_enabled = False
             # Disable for the specified number of minutes
@@ -177,6 +199,13 @@ class AutoMod(commands.Cog):
             await interaction.response.send_message(
                 f"Word filtering has been disabled for {time} minute(s)."
             )
+            await log_moderation(
+                guild_id=interaction.guild.id,
+                moderator_id=interaction.user.id,
+                action=f"Temporarily disabled link filter for {time} minutes"
+            )
+
+
     @app_commands.command(
     name="enable_link_filter",
     description="Enable the link filter"
@@ -196,6 +225,11 @@ class AutoMod(commands.Cog):
         await interaction.response.send_message(
             "Link filtering has been enabled."
         )
+        await log_moderation(
+                        guild_id=interaction.guild.id,
+                        moderator_id=interaction.user.id,
+                        action="Enabled the link filter"
+                    )
 
 
 
