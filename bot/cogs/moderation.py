@@ -4,7 +4,7 @@ from discord.ext import commands
 from utils.permissions import is_moderator, is_admin
 from datetime import timedelta
 from dotenv import load_dotenv
-from database.logging_db import log_moderation
+from database.logging_db import *
 import os
 
 from main import GUILD_ID
@@ -199,6 +199,30 @@ class Moderation(commands.Cog):
             moderator_id=interaction.user.id,
             action="warn",
             reason=reason)
+
+
+    #----------retrieve user logs----------------------
+    @app_commands.command(name="get_logs", description="view a members most recent moderation actions")
+    @app_commands.guild_only()
+    async def get_logs(self, interaction: discord.Interaction, member: discord.Member):
+        logs = await get_user_logs(interaction.guild.id, member.id)
+         
+        embed = discord.Embed(
+            title=f"Moderation History: {member}",
+            color=discord.Color.blue()
+        )
+
+        for log in logs[:10]:
+            embed.add_field(
+                name=f"Action: {log['action']}",
+                value=(
+                    f"Reason: {log['reason'] or 'No reason provided'}\n"
+                    f"Moderator ID: {log['moderator_id']}\n"
+                    f"Date: {log['timestamp']}"
+                ),
+                inline=False
+            )
+        await interaction.response.send_message(embed=embed)
               
 
 async def setup(bot: commands.Bot):

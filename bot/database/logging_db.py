@@ -30,9 +30,7 @@ async def log_moderation(
         await db.commit()
 
 
-async def get_user_logs(guild_id: int, user_id: int):
-    """Retrieve a user's moderation history."""
-
+async def get_user_logs(guild_id: int, user_id: int, limit: int = 10):
     async with aiosqlite.connect(LOG_DB) as db:
         db.row_factory = aiosqlite.Row
 
@@ -41,5 +39,6 @@ async def get_user_logs(guild_id: int, user_id: int):
             FROM moderation_logs
             WHERE guild_id = ? AND user_id = ?
             ORDER BY timestamp DESC, id DESC
-        """, (guild_id, user_id)) as cursor:
+            LIMIT ?
+        """, (guild_id, user_id, limit)) as cursor:
             return await cursor.fetchall()
