@@ -205,6 +205,10 @@ class Moderation(commands.Cog):
     @app_commands.command(name="get_logs", description="view a members most recent moderation actions")
     @app_commands.guild_only()
     async def get_logs(self, interaction: discord.Interaction, member: discord.Member):
+        if not is_moderator(interaction.user):
+                await interaction.response.send_message("You dont have permission to use this command", ephemeral=True)
+                return
+
         logs = await get_user_logs(interaction.guild.id, member.id)
          
         embed = discord.Embed(
